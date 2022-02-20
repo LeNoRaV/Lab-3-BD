@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 
-//для получения MessageBox
+//для получения MessageBox  +
 void MainWindow::getMessageBox(const QString textError,bool error){
     QMessageBox msgBox;
     if(error) msgBox.setIcon(QMessageBox::Critical);

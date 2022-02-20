@@ -8,6 +8,22 @@
 #include <QRegularExpressionValidator>
 #include "mydialog.h"
 
+//Cтруктура участницы
+struct Participant{
+    QLineEdit* record_book;
+    QLineEdit* name;
+    QLineEdit* weight;
+    QLineEdit* height;
+    QLineEdit* age;
+    QLineEdit* talant;
+};
+
+//Структура номинации
+struct Nomination{
+    QLineEdit* id;
+    QLineEdit* name;
+};
+
 struct Person{
 
     QLineEdit* telephone;
