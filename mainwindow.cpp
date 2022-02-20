@@ -93,9 +93,9 @@ void MainWindow::slotTriggeredMenuBar(QAction* action){
         if(who.section(",",0,0)=="Участница"){
             tutorProfile(who.section(",",1,1));
         }
-        if(who.section(",",0,0)=="Жюри"){
-            clientProfile(who.section(",",1,1));
-        }
+//        if(who.section(",",0,0)=="Жюри"){
+//            clientProfile(who.section(",",1,1));
+//        }
     }
     if(action->text()==tr("&Участницы")){
         setWindowTitle(tr("Участницы"));
@@ -162,7 +162,7 @@ void MainWindow::slotTriggeredMenuBar(QAction* action){
         model->setQuery(query);
         tableView->setModel(model);
         tableView->setContextMenuPolicy(Qt::CustomContextMenu);
-        connect(tableView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(slotDeleteTutor2(QPoint))); //!!!
+        connect(tableView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(slotDeleteTutor2(QPoint)));
         setCentralWidget(tableView);
     }
     if(action->text()==tr("Добавить или удалить номинацию")){
@@ -225,22 +225,22 @@ void MainWindow::slotTriggeredMenuBar(QAction* action){
 
 //        connect(add,SIGNAL(pressed()),this,SLOT(slotAddRegion()));
 //    }
-    if(action->text()==tr("Удалить члена жюри")){          // для жюри
-                                                           // возможно надо сделать с одним человеком
-        QSqlQuery query(db);
-        if(!query.exec("SELECT * FROM az_clients;")){
-            getMessageBox("Таблица с жюри не открылась",true);
-            return;
-        }
-        delete centralWidget();
-        tableView=new QTableView();
-        tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-        model->setQuery(query);
-        tableView->setModel(model);
-        tableView->setContextMenuPolicy(Qt::CustomContextMenu);
-        connect(tableView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(slotDeleteClient(QPoint))); //!!!
-        setCentralWidget(tableView);
-    }
+//    if(action->text()==tr("Удалить члена жюри")){          // для жюри
+//                                                           // возможно надо сделать с одним человеком
+//        QSqlQuery query(db);
+//        if(!query.exec("SELECT * FROM az_clients;")){
+//            getMessageBox("Таблица с жюри не открылась",true);
+//            return;
+//        }
+//        delete centralWidget();
+//        tableView=new QTableView();
+//        tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+//        model->setQuery(query);
+//        tableView->setModel(model);
+//        tableView->setContextMenuPolicy(Qt::CustomContextMenu);
+//        connect(tableView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(slotDeleteClient(QPoint))); //!!!
+//        setCentralWidget(tableView);
+//    }
     if(action->text()==tr("статистика")){                       // баллы у участниц по номинациям
         QLabel* label1=new QLabel("Статистика по",this);
         label=new QLabel("Средний результат",this);

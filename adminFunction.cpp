@@ -27,7 +27,7 @@ void MainWindow::adminProfile(){
 //    }
 }
 
-static int intDeleteOrAdd;
+static int intDeleteOrAdd; // ориентироваться по таблице
 void MainWindow::slotPlusAndDeleteTutor(QPoint point){
     intDeleteOrAdd=tableView->indexAt(point).row();
     QMenu* menu=new QMenu(this);
@@ -114,7 +114,7 @@ void MainWindow::slotDeleteAllTutors(){
 }
 
 
-void MainWindow::slotDeleteDiscipline(QPoint point){
+void MainWindow::slotDeleteDiscipline(QPoint point){  //номинации
     intDeleteOrAdd=tableView->indexAt(point).row();
     QMenu* menu=new QMenu(this);
     QAction* deleteDiscipline=new QAction(tr("Удалить"),this);
@@ -125,18 +125,18 @@ void MainWindow::slotDeleteDiscipline(QPoint point){
 
 void MainWindow::slotDeleteDiscipline(){
     QSqlQuery q(db);
-    if(!q.exec("SELECT * FROM az_disciplines;")){
-        getMessageBox("Не открылась таблица с дисциплинами",true);
+    if(!q.exec("SELECT * FROM lnr_nominations;")){
+        getMessageBox("Не открылась таблица с номинациями",true);
         return;
     }
     q.seek(intDeleteOrAdd);
-    QString str=q.value(0).toString();
-    if(!q.exec("DELETE FROM az_disciplines WHERE Дисциплина='"+str+"';")){
-        getMessageBox("Не удалось удалить дисциплину (есть репетиторы, ведущие данную дисциплину)",true);
+    QString str=q.value(1).toString();                              //!!!!!!!!!!
+    if(!q.exec("DELETE FROM lnr_nominations WHERE ID='"+str+"';")){
+        getMessageBox("Не удалось удалить номинацию",true);
         return;
     }
-    if(!q.exec("SELECT * FROM az_disciplines;")){
-        getMessageBox("Не открылась таблица с дисциплинами",true);
+    if(!q.exec("SELECT * FROM lnr_nominations;")){
+        getMessageBox("Не открылась таблица с номинациями",true);
         return;
     }
     model->setQuery(q);
@@ -146,15 +146,15 @@ void MainWindow::slotDeleteDiscipline(){
 void MainWindow::slotAddDiscipline(){
     QSqlQuery q(db);
     if(lineEdit->text()==nullptr){
-        getMessageBox("Нельзя добавить то, чего нет",true);
+        getMessageBox("Введите название номинации",true);
         return;
     }
-    if(!q.exec("INSERT INTO az_disciplines VALUES ('"+lineEdit->text()+"');")){
-        getMessageBox("Не удаётся добавить дисциплину (скорее всего, такая дисциплина уже есть)",true);
+    if(!q.exec("INSERT INTO lnr_nominations VALUES ('"+lineEdit->text()+"');")){
+        getMessageBox("Не удаётся добавить номинацию",true);
         return;
     }
-    if(!q.exec("SELECT * FROM az_disciplines;")){
-        getMessageBox("Не открылась таблица с дисциплинами",true);
+    if(!q.exec("SELECT * FROM lnr_nominations;")){
+        getMessageBox("Не открылась таблица с номинациями",true);
         return;
     }
     model->setQuery(q);
@@ -208,7 +208,7 @@ void MainWindow::slotAddRegion(){
     tableView->reset();
 }
 
-void MainWindow::slotDeleteTutor2(QPoint point){
+void MainWindow::slotDeleteTutor2(QPoint point){     //delete participant
     intDeleteOrAdd=tableView->indexAt(point).row();
     QMenu* menu=new QMenu(this);
     QAction* deleteTutor=new QAction(tr("Удалить"),this);
@@ -219,18 +219,18 @@ void MainWindow::slotDeleteTutor2(QPoint point){
 
 void MainWindow::slotDeleteTutor2(){
     QSqlQuery q(db);
-    if(!q.exec("SELECT * FROM az_tutors;")){
+    if(!q.exec("SELECT * FROM lnr_participants;")){
         getMessageBox("Не открылась таблица с репетиторами",true);
         return;
     }
     q.seek(intDeleteOrAdd);
     QString str=q.value(0).toString();
-    if(!q.exec("DELETE FROM az_tutors WHERE Телефон='"+str+"';")){
-        getMessageBox("Не удалось удалить из списка репетиторов",true);
+    if(!q.exec("DELETE FROM lnr_participants WHERE Номер_зачётки='"+str+"';")){
+        getMessageBox("Не удалось удалить из списка участниц",true);
         return;
     }
-    if(!q.exec("SELECT * FROM az_tutors;")){
-        getMessageBox("Не открылась таблица с репетиторами",true);
+    if(!q.exec("SELECT * FROM lnr_participants;")){
+        getMessageBox("Не открылась таблица с участницами",true);
         return;
     }
     model->setQuery(q);

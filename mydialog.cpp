@@ -17,8 +17,8 @@ MyDialogEnter::MyDialogEnter(QSqlDatabase* db1, QString* result1,QWidget *parent
     setWindowTitle("Вход");
 //    setWindowIcon(QIcon(":/MyPictures/pictures/enter.png"));
     login=new QLineEdit(this);
-    QRegularExpression regExp("[1-9]{1}[0-9]{10}");
-    login->setValidator(new QRegularExpressionValidator(regExp,this));
+//    QRegularExpression regExp("[1-9]{1}[0-9]{10}");
+//    login->setValidator(new QRegularExpressionValidator(regExp,this));
     login->setPlaceholderText("Логин");
     password=new QLineEdit(this);
     password->setPlaceholderText("Пароль");
@@ -111,14 +111,14 @@ void MyDialogEnter::slotEnter(){
 }
 
 void MyDialogEnter::slotTriggeredMenuBar(QAction* action){
-    if(action->text()==tr("&клиента")){
+    if(action->text()==tr("&Мисс Бауман 2022")){
         MyDialogRegistration* dialogRegistration=new MyDialogRegistration(db,true);
         dialogRegistration->exec();
     }
-    if(action->text()==tr("&репетитора")){
-        MyDialogRegistration* dialogRegistration=new MyDialogRegistration(db,false);
-        dialogRegistration->exec();
-    }
+//    if(action->text()==tr("&репетитора")){
+//        MyDialogRegistration* dialogRegistration=new MyDialogRegistration(db,false);
+//        dialogRegistration->exec();
+//    }
 }
 
 void MyDialogRegistration::getMessageBox(const QString textError,bool error){
