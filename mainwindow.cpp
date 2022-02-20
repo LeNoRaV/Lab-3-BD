@@ -217,7 +217,7 @@ void MainWindow::slotTriggeredMenuBar(QAction* action){
         }
         delete centralWidget();
         tableView=new QTableView();
-        tableView->setEditTriggers(QAbstractItemView::NosEditTriggers);
+        tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
         model->setQuery(query);
         tableView->setModel(model);
         tableView->setContextMenuPolicy(Qt::CustomContextMenu);
