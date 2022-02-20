@@ -41,7 +41,7 @@ MainWindow::MainWindow(QWidget *parent)
     setPalette(*palette);
 
     menuBar=new QMenuBar(this);
-    changeMenuBar({{tr("&Войти")},{tr("&Репетиторы")}});
+    changeMenuBar({{tr("&Войти")},{tr("&Участницы")}});
 
     setMenuBar(menuBar);
     connect(menuBar,SIGNAL(triggered(QAction*)),this,SLOT(slotTriggeredMenuBar(QAction*)));
@@ -73,21 +73,21 @@ void MainWindow::slotTriggeredMenuBar(QAction* action){
     if(action->text()==tr("&Войти")){
         QString whoAndPhone;
         MyDialogEnter(&db,&whoAndPhone).exec();
-        if(whoAndPhone.section(",",0,0)=="админ"){
+        if(whoAndPhone.section(",",0,0)=="Аминестратор"){
             adminProfile();
         }
-        if(whoAndPhone.section(",",0,0)=="репетитор"){
+        if(whoAndPhone.section(",",0,0)=="Участница"){
             tutorProfile(whoAndPhone.section(",",1,1));
         }
-        if(whoAndPhone.section(",",0,0)=="клиент"){
+        if(whoAndPhone.section(",",0,0)=="Жюри"){
             clientProfile(whoAndPhone.section(",",1,1));
         }
     }
-    if(action->text()==tr("&Репетиторы")){
-        setWindowTitle(tr("Репетиторы"));
+    if(action->text()==tr("&Участницы")){
+        setWindowTitle(tr("Участницы"));
         QSqlQuery query (db);
-        if(!query.exec("SELECT Телефон, ФИО, Дисциплина, Регион, Цена FROM az_tutors;")){
-            getMessageBox("Таблица с репетиторами не открылась",true);
+        if(!query.exec("SELECT Телефон, ФИО, Дисциплина, Регион, Цена FROM az_tutors;")){      //!!!
+            getMessageBox("Таблица с участницами не открылась",true);
             return;
         }
         model->setQuery(query);
@@ -100,14 +100,14 @@ void MainWindow::slotTriggeredMenuBar(QAction* action){
         delete tableView;
         tableView=new QTableView();
         tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-        changeMenuBar({{tr("&Войти")},{tr("&Репетиторы")}});
+        changeMenuBar({{tr("&Войти")},{tr("&Участницы")}});
     }
 
     //меню админа
-    if(action->text()==tr("добавить/удалить репетитора (из регистрирующихся)")){
+    if(action->text()==tr("добавить/удалить участницу (из регистрирующихся)")){
         QSqlQuery query(db);
         if(!query.exec("SELECT * FROM az_reg_tutors;")){
-            getMessageBox("Таблица с репетиторами не открылась",true);
+            getMessageBox("Таблица с участницами не открылась",true);
             return;
         }
         delete centralWidget();
@@ -133,10 +133,10 @@ void MainWindow::slotTriggeredMenuBar(QAction* action){
         connect(addAll,SIGNAL(pressed()),this,SLOT(slotAddAllTutors()));
         connect(deleteAll,SIGNAL(pressed()),this,SLOT(slotDeleteAllTutors()));
     }
-    if(action->text()==tr("удалить репетитора (из зарегистрированных)")){
+    if(action->text()==tr("удалить участицу (из зарегистрированных)")){
         QSqlQuery query(db);
         if(!query.exec("SELECT * FROM az_tutors;")){
-            getMessageBox("Таблица с репетиторами не открылась",true);
+            getMessageBox("Таблица с участницами не открылась",true);
             return;
         }
         delete centralWidget();
@@ -148,10 +148,10 @@ void MainWindow::slotTriggeredMenuBar(QAction* action){
         connect(tableView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(slotDeleteTutor2(QPoint)));
         setCentralWidget(tableView);
     }
-    if(action->text()==tr("добавить/удалить дисциплину")){
+    if(action->text()==tr("добавить/удалить номинацию")){
         QSqlQuery query(db);
         if(!query.exec("SELECT * FROM az_disciplines;")){
-            getMessageBox("Таблица с дисциплинами не открылась",true);
+            getMessageBox("Таблица с номинациями не открылась",true);
             return;
         }
         delete centralWidget();
@@ -164,7 +164,7 @@ void MainWindow::slotTriggeredMenuBar(QAction* action){
 
         QPushButton* add=new QPushButton("&Добавить",this);
         lineEdit=new QLineEdit(this);
-        lineEdit->setPlaceholderText("Введите дисциплину");
+        lineEdit->setPlaceholderText("Введите номинацию");
         QVBoxLayout* layout1=new QVBoxLayout();
         layout1->addWidget(lineEdit);
         layout1->addWidget(add);
@@ -178,7 +178,7 @@ void MainWindow::slotTriggeredMenuBar(QAction* action){
 
         connect(add,SIGNAL(pressed()),this,SLOT(slotAddDiscipline()));
     }
-    if(action->text()==tr("добавить/удалить регион")){
+    if(action->text()==tr("добавить/удалить регион")){                          // не надо
         QSqlQuery query(db);
         if(!query.exec("SELECT * FROM az_regions;")){
             getMessageBox("Таблица с регионами не открылась",true);
@@ -208,22 +208,23 @@ void MainWindow::slotTriggeredMenuBar(QAction* action){
 
         connect(add,SIGNAL(pressed()),this,SLOT(slotAddRegion()));
     }
-    if(action->text()==tr("удалить клиента")){
+    if(action->text()==tr("удалить члена жюри")){          // для жюри
+                                                           // возможно надо сделать с одним человеком
         QSqlQuery query(db);
         if(!query.exec("SELECT * FROM az_clients;")){
-            getMessageBox("Таблица с клиентами не открылась",true);
+            getMessageBox("Таблица с жюри не открылась",true);
             return;
         }
         delete centralWidget();
         tableView=new QTableView();
-        tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        tableView->setEditTriggers(QAbstractItemView::NosEditTriggers);
         model->setQuery(query);
         tableView->setModel(model);
         tableView->setContextMenuPolicy(Qt::CustomContextMenu);
         connect(tableView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(slotDeleteClient(QPoint)));
         setCentralWidget(tableView);
     }
-    if(action->text()==tr("статистика")){
+    if(action->text()==tr("статистика")){                       // баллы у участниц по номинациям
         QLabel* label1=new QLabel("Статистика по",this);
         label=new QLabel("Средний результат",this);
         person2.date=new QComboBox(this);
@@ -244,7 +245,7 @@ void MainWindow::slotTriggeredMenuBar(QAction* action){
         emit person2.date->activated(0);
     }
     if(action->text()==tr("профиль администратора")){
-        QFile file("D:/bd/lr3/files/admin.txt");
+        QFile file("D:/bd/lr3/files/admin.txt");                //заменить путь
         if(!file.open(QIODevice::ReadOnly)){
             getMessageBox("Файл с данными администратора не открылся",true);
             return;
@@ -271,21 +272,21 @@ void MainWindow::slotTriggeredMenuBar(QAction* action){
 
         QSqlQuery query1(db);
         if(!query1.exec("SELECT COUNT(*) FROM az_tutors;")){
-            getMessageBox("Не открылась таблица с репетиторами",true);
+            getMessageBox("Не открылась таблица с участницами",true);
             return;
         }
         query1.first();
         int tutors=query1.value(0).toInt();
         if(!query1.exec("SELECT COUNT(*) FROM az_clients;")){
-            getMessageBox("Не открылась таблица с клиентами",true);
+            getMessageBox("Не открылась таблица с жюри",true);
             return;
         }
         query1.first();
         int clients=query1.value(0).toInt();
 
         double profit=0;
-        if(!query1.exec("SELECT Цена FROM az_lessons WHERE Было_занятие=true;")){
-            getMessageBox("Не открылась таблица с занятиями",true);
+        if(!query1.exec("SELECT Цена FROM az_lessons WHERE Было_занятие=true;")){   //???
+            getMessageBox("Не открылась таблица с номинациями",true);
             return;
         }
         query1.first();
@@ -293,9 +294,9 @@ void MainWindow::slotTriggeredMenuBar(QAction* action){
             profit+=0.3*(query1.value(0).toInt());
         }while(query1.next());
 
-        QLabel* statistics=new QLabel("Основная статистика");
+        QLabel* statistics=new QLabel("Основная статистика");            // может вообще удалим статистику
         statistics->setFont(font2);
-        QLabel* stat=new QLabel("Количество репетиторов: "+QString::number(tutors)+"\nКоличество клиентов: "+QString::number(clients)+"\nОбщая сумма дохода: "+QString::number(profit)+"руб.",this);
+        QLabel* stat=new QLabel("Количество участниц: "+QString::number(tutors)+"\nКоличество клиентов: "+QString::number(clients)+"\nОбщая сумма дохода: "+QString::number(profit)+"руб.",this);
         stat->setFont(font1);
 
         QVBoxLayout* layout1=new QVBoxLayout();
@@ -317,7 +318,7 @@ void MainWindow::slotTriggeredMenuBar(QAction* action){
         setCentralWidget(widget);
     }
     if(action->text()==tr("настройки профиля администратора")){
-        QFile file("D:/bd/lr3/files/admin.txt");
+        QFile file("D:/bd/lr3/files/admin.txt");                //заменить путь
         if(!file.open(QIODevice::ReadOnly)) {
             getMessageBox("Файл с данными администратора не открылся",true);
             return;
@@ -356,13 +357,13 @@ void MainWindow::slotTriggeredMenuBar(QAction* action){
         palette->setBrush(QPalette::Window, bkgnd);
         setPalette(*palette);
 
-        changeMenuBar({{tr("&Войти")},{tr("&Репетиторы")}});
+        changeMenuBar({{tr("&Войти")},{tr("&Участницы")}});
     }
 
 
 
-    //меню репетитора
-    if(action->text()==tr("профиль репетитора")){
+    //меню участницы
+    if(action->text()==tr("Профиль участницы")){
 
         QFont font1;
         font1.setPixelSize(20);
@@ -375,14 +376,14 @@ void MainWindow::slotTriggeredMenuBar(QAction* action){
         font4.setBold(true);
 
         QSqlQuery q(db);
-        if(!q.exec("SELECT * FROM az_tutors WHERE Телефон='"+property("telephone").toString()+"';")){
+        if(!q.exec("SELECT * FROM az_tutors WHERE Телефон='"+property("telephone").toString()+"';")){  // по зачетке
             getMessageBox("Таблица с репетиторами не открывается",true);
             return;
          }
         q.first();
-        QLabel* admin=new QLabel("Репетитор");
+        QLabel* admin=new QLabel("Участница");
         admin->setFont(font4);
-        QLabel* infa=new QLabel("Номер телефона: "+q.value(0).toString()
+        QLabel* infa=new QLabel("Номер телефона: "+q.value(0).toString()      //переделать
                                 +"\nФИО: "+q.value(1).toString()
                                 +"\nПредмет: "+q.value(2).toString()
                                 +"\nРегион: "+q.value(3).toString()

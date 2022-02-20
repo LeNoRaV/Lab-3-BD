@@ -1,5 +1,7 @@
 #include "mainwindow.h"
 
+// заменить все на Participant (участниц)
+
 void MainWindow::clientProfile(QString telephone){
     changeMenuBar({{"Занятия","выбрать занятие","выбранные занятия","прошедшие занятия"},{"Другое","профиль клиента","настройки профиля клиента","выйти"}});
     palette->setColor(QPalette::Window,Qt::lightGray);

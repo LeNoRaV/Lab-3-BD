@@ -53,6 +53,10 @@ private:
 
     QLineEdit* lineEdit;
     QLineEdit* lineEdit2;
+
+    Participant participant;
+
+
     Person person;
     Person2 person2;
     QPalette* palette;
@@ -64,9 +68,11 @@ public:
 
     void changeMenuBar(const QList<QStringList>);
 
-    void adminProfile();
+    void adminProfile(); // Админ
     void tutorProfile(QString);
+    // void juryProfile(QString); // Жюри
     void clientProfile(QString);
+    // void participantProfile(QString); // Участница
 
     void getMessageBox(const QString,bool);
 private slots:
