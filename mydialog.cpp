@@ -15,11 +15,11 @@ MyDialogEnter::MyDialogEnter(QSqlDatabase* db1, QString* result1,QWidget *parent
     db=db1;
     setModal(true);
     setWindowTitle("Вход");
-    setWindowIcon(QIcon(":/MyPictures/pictures/enter.png"));
+//    setWindowIcon(QIcon(":/MyPictures/pictures/enter.png"));
     login=new QLineEdit(this);
     QRegularExpression regExp("[1-9]{1}[0-9]{10}");
     login->setValidator(new QRegularExpressionValidator(regExp,this));
-    login->setPlaceholderText("Номер телефона");
+    login->setPlaceholderText("Логин");
     password=new QLineEdit(this);
     password->setPlaceholderText("Пароль");
     password->setEchoMode(QLineEdit::Password);
@@ -27,17 +27,17 @@ MyDialogEnter::MyDialogEnter(QSqlDatabase* db1, QString* result1,QWidget *parent
     QPushButton* enter=new QPushButton("&Войти",this);
     QMenuBar* menuBar=new QMenuBar(this);
     QMenu* menu=new QMenu("&Регистрация",this);
-    QAction* client=new QAction(tr("&клиента"));
+    QAction* client=new QAction(tr("&Мисс Бауман 2022"));
     client->setIcon(QIcon(":/MyPictures/pictures/client.png"));
     menu->addAction(client);
-    QAction* tutor=new QAction(tr("&репетитора"));
-    tutor->setIcon(QIcon(":/MyPictures/pictures/tutor.png"));
-    menu->addAction(tutor);
+//    QAction* tutor=new QAction(tr("&репетитора"));
+//    tutor->setIcon(QIcon(":/MyPictures/pictures/tutor.png"));
+//    menu->addAction(tutor);
     menuBar->addMenu(menu);
 
     QLabel* label=new QLabel("Войти как",this);
     box=new QComboBox(this);
-    box->addItems({"клиент","репетитор","администратор"});
+    box->addItems({"Участница","Жюри","Администратор"});
 
 
     QHBoxLayout* layout1=new QHBoxLayout();
@@ -63,7 +63,7 @@ MyDialogEnter::MyDialogEnter(QSqlDatabase* db1, QString* result1,QWidget *parent
 
 void MyDialogEnter::slotEnter(){
     if(box->currentText()=="администратор"){
-        QFile file("D:/bd/lr3/files/admin.txt");
+        QFile file("C:/Users/lesko/Desktop/C++/DB3-jul/Lab-3-BD/files/admin.txt");
         if(!file.open(QIODevice::ReadOnly)){
             getMessageBox("Вы не можете войти как администратор с этого устройства",true);
             return;
@@ -77,7 +77,7 @@ void MyDialogEnter::slotEnter(){
         }
         else getMessageBox("Ошибка входа: проверьте правильность телефона и пароля",true);
     }
-    if(box->currentText()=="репетитор"){
+    if(box->currentText()=="Жюри"){
         QSqlQuery query(*db);
         if(!query.exec("SELECT Телефон,Пароль FROM az_tutors;")){
            getMessageBox("Таблица с репетиторами не открывается",true);

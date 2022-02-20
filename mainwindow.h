@@ -62,11 +62,13 @@ private:
     QPalette* palette;
 
     QLabel* label;
+
+    QLabel* infoLabel;
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    void changeMenuBar(const QList<QStringList>);
+    void changeMenuBar(const QList<QStringList>);  //done
 
     void adminProfile(); // Админ
     void tutorProfile(QString);
@@ -74,7 +76,7 @@ public:
     void clientProfile(QString);
     // void participantProfile(QString); // Участница
 
-    void getMessageBox(const QString,bool);
+    void getMessageBox(const QString,bool);   // done
 private slots:
     void slotTriggeredMenuBar(QAction*);
 

@@ -1,30 +1,30 @@
 #include "mainwindow.h"
 
 void MainWindow::adminProfile(){
-    changeMenuBar({{"Добавить/удалить","добавить/удалить участницу (из регистрирующихся)", "добавить/удалить номинацию", "удалить участницу"},{"Другое", "статистика","профиль администратора","настройки профиля администратора","выйти"}});
+    changeMenuBar({{"Удалить участницу", "Добавить/удалить номинацию"},{"Другое", "Статистика","Профиль администратора","Настройки профиля администратора","Выйти"}});
 
     palette->setColor(QPalette::Window,Qt::lightGray);
     setPalette(*palette);
     setWindowTitle("Администратор");
-    QAction* act=new QAction("профиль администратора");
+    QAction* act=new QAction("Профиль администратора");
     emit menuBar->triggered(act);
 
-    QSqlQuery q(db);
-    if(!q.exec("SELECT COUNT(*) FROM az_reg_tutors;")){
-        getMessageBox("Не открылась таблица с репетиторами на регистрацию",true);
-        return;
-    }
-    q.first();
-    if(q.value(0).toInt()!=0){
-        QMessageBox* box=new QMessageBox(QMessageBox::Question,"Напоминание","У Вас есть незарегистрированные репетиторы. Вы хотите перейти к ним?");
-        QPushButton* button1=box->addButton(tr("Да"),QMessageBox::YesRole);
-        QPushButton* button2=box->addButton(tr("Нет"),QMessageBox::NoRole);
-        box->exec();
-        if(box->clickedButton()==button1){
-            QAction* act=new QAction(tr("добавить/удалить репетитора (из регистрирующихся)"),this);
-            emit menuBar->triggered(act);
-        }
-    }
+//    QSqlQuery q(db);
+//    if(!q.exec("SELECT COUNT(*) FROM lnr_participants;")){
+//        getMessageBox("Не открылась таблица с участницами",true);
+//        return;
+//    }
+//    q.first();
+//    if(q.value(0).toInt()!=0){
+//        QMessageBox* box=new QMessageBox(QMessageBox::Question,"Напоминание","У Вас есть незарегистрированные репетиторы. Вы хотите перейти к ним?");
+//        QPushButton* button1=box->addButton(tr("Да"),QMessageBox::YesRole);
+//        QPushButton* button2=box->addButton(tr("Нет"),QMessageBox::NoRole);
+//        box->exec();
+//        if(box->clickedButton()==button1){
+//            QAction* act=new QAction(tr("добавить/удалить репетитора (из регистрирующихся)"),this);
+//            emit menuBar->triggered(act);
+//        }
+//    }
 }
 
 static int intDeleteOrAdd;
@@ -275,7 +275,7 @@ void MainWindow::changeInfoAdmin(){
         getMessageBox("В номере телефона недостаточно цифр! Перепроверьте его.",true);
         return;
     }
-    QFile file("D:/bd/lr3/files/admin.txt");
+    QFile file("C:/Users/lesko/Desktop/C++/DB3-jul/Lab-3-BD/files/admin.txt");
     if(!file.open(QIODevice::WriteOnly)){
         getMessageBox("Не открывается файл",true);
         return;

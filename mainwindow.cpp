@@ -27,18 +27,32 @@ void MainWindow::changeMenuBar(const QList<QStringList> listAction){
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    setWindowIcon(QIcon(":/MyPictures/pictures/mainIcon.jpg"));
+    QWidget *widget = new QWidget;
+    setCentralWidget(widget);
+
+//    setWindowIcon(QIcon(":/MyPictures/pictures/mainIcon.jpg"));
     setWindowTitle(tr("Главная страница"));
     tableView=new QTableView();
     tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     model=new QSqlTableModel();
 
     //Настройка картинки на главной странице
-    QPixmap bkgnd(":/MyPictures/pictures/mainPicture.jfif");
-    setFixedSize(QSize(bkgnd.width(),bkgnd.height()));
-    palette=new QPalette();
-    palette->setBrush(QPalette::Window, bkgnd);
-    setPalette(*palette);
+//    QPixmap bkgnd(":/MyPictures/pictures/mainPicture.jfif");
+//    setFixedSize(QSize(bkgnd.width(),bkgnd.height()));
+//    palette=new QPalette();
+//    palette->setBrush(QPalette::Window, bkgnd);
+//    setPalette(*palette);
+
+    infoLabel = new QLabel(tr("<i><b>Мисс Бауман 2022</b></i>"));
+    infoLabel->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
+    infoLabel->setAlignment(Qt::AlignCenter);
+
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->setContentsMargins(5, 5, 5, 5);
+    layout->addWidget(infoLabel);
+    widget->setLayout(layout);
+
+    setFixedSize(QSize(550,500));
 
     menuBar=new QMenuBar(this);
     changeMenuBar({{tr("&Войти")},{tr("&Участницы")}});
@@ -70,43 +84,75 @@ MainWindow::~MainWindow()
 //слот всевозможных кнопок меню
 void MainWindow::slotTriggeredMenuBar(QAction* action){
     //Меню до входа
-    if(action->text()==tr("&Войти")){
-        QString whoAndPhone;
-        MyDialogEnter(&db,&whoAndPhone).exec();
-        if(whoAndPhone.section(",",0,0)=="Аминестратор"){
+    if(action->text()==tr("&Войти")){                   // what is this?
+        QString who;
+        MyDialogEnter(&db,&who).exec();
+        if(who.section(",",0,0)=="Аминистратор"){
             adminProfile();
         }
-        if(whoAndPhone.section(",",0,0)=="Участница"){
-            tutorProfile(whoAndPhone.section(",",1,1));
+        if(who.section(",",0,0)=="Участница"){
+            tutorProfile(who.section(",",1,1));
         }
-        if(whoAndPhone.section(",",0,0)=="Жюри"){
-            clientProfile(whoAndPhone.section(",",1,1));
+        if(who.section(",",0,0)=="Жюри"){
+            clientProfile(who.section(",",1,1));
         }
     }
     if(action->text()==tr("&Участницы")){
         setWindowTitle(tr("Участницы"));
         QSqlQuery query (db);
-        if(!query.exec("SELECT Телефон, ФИО, Дисциплина, Регион, Цена FROM az_tutors;")){      //!!!
+        if(!query.exec("SELECT Номер_зачётки, ФИО, Вес, Рост, Возраст FROM lnr_participants;")){
             getMessageBox("Таблица с участницами не открылась",true);
             return;
         }
         model->setQuery(query);
         tableView->setModel(model);
         setCentralWidget(tableView);
-        changeMenuBar({{tr("&Войти")},{tr("Вернуться на главную")}});
+        changeMenuBar({{tr("&Войти")}});
     }
-    if(action->text()==tr("Вернуться на главную")){
-        setWindowTitle(tr("Главная страница"));
-        delete tableView;
-        tableView=new QTableView();
-        tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-        changeMenuBar({{tr("&Войти")},{tr("&Участницы")}});
-    }
+//    if(action->text()==tr("Вернуться на главную")){
+//        setWindowTitle(tr("Главная страница"));
+//        delete tableView;
+//        tableView=new QTableView();
+//        tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+//        changeMenuBar({{tr("&Войти")},{tr("&Участницы")}});
+//    }
 
     //меню админа
-    if(action->text()==tr("добавить/удалить участницу (из регистрирующихся)")){
+//    if(action->text()==tr("добавить/удалить участницу")){
+//        QSqlQuery query(db);
+//        if(!query.exec("SELECT * FROM lnr_participants;")){
+//            getMessageBox("Таблица с участницами не открылась",true);
+//            return;
+//        }
+//        delete centralWidget();
+//        tableView=new QTableView();
+//        tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+//        model->setQuery(query);
+//        tableView->setModel(model);
+//        tableView->setContextMenuPolicy(Qt::CustomContextMenu);
+//        connect(tableView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(slotPlusAndDeleteTutor(QPoint)));
+//        //func drop and add
+
+//        QPushButton* addAll=new QPushButton("&Добавить всех",this);
+//        QPushButton* deleteAll=new QPushButton("&Удалить всех",this);
+//        QHBoxLayout* layout1=new QHBoxLayout();
+//        layout1->addWidget(addAll);
+//        layout1->addWidget(deleteAll);
+//        QVBoxLayout* layout2=new QVBoxLayout();
+//        layout2->addWidget(tableView);
+//        layout2->addLayout(layout1);
+//        QWidget* widget=new QWidget(this);
+//        widget->setLayout(layout2);
+//        setCentralWidget(widget);
+
+//        connect(addAll,SIGNAL(pressed()),this,SLOT(slotAddAllTutors()));
+//        connect(deleteAll,SIGNAL(pressed()),this,SLOT(slotDeleteAllTutors()));
+//    }
+
+    //меню админа
+    if(action->text()==tr("Удалить участицу")){
         QSqlQuery query(db);
-        if(!query.exec("SELECT * FROM az_reg_tutors;")){
+        if(!query.exec("SELECT * FROM lnr_participants;")){
             getMessageBox("Таблица с участницами не открылась",true);
             return;
         }
@@ -116,41 +162,12 @@ void MainWindow::slotTriggeredMenuBar(QAction* action){
         model->setQuery(query);
         tableView->setModel(model);
         tableView->setContextMenuPolicy(Qt::CustomContextMenu);
-        connect(tableView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(slotPlusAndDeleteTutor(QPoint)));
-
-        QPushButton* addAll=new QPushButton("&Добавить всех",this);
-        QPushButton* deleteAll=new QPushButton("&Удалить всех",this);
-        QHBoxLayout* layout1=new QHBoxLayout();
-        layout1->addWidget(addAll);
-        layout1->addWidget(deleteAll);
-        QVBoxLayout* layout2=new QVBoxLayout();
-        layout2->addWidget(tableView);
-        layout2->addLayout(layout1);
-        QWidget* widget=new QWidget(this);
-        widget->setLayout(layout2);
-        setCentralWidget(widget);
-
-        connect(addAll,SIGNAL(pressed()),this,SLOT(slotAddAllTutors()));
-        connect(deleteAll,SIGNAL(pressed()),this,SLOT(slotDeleteAllTutors()));
-    }
-    if(action->text()==tr("удалить участицу (из зарегистрированных)")){
-        QSqlQuery query(db);
-        if(!query.exec("SELECT * FROM az_tutors;")){
-            getMessageBox("Таблица с участницами не открылась",true);
-            return;
-        }
-        delete centralWidget();
-        tableView=new QTableView();
-        tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-        model->setQuery(query);
-        tableView->setModel(model);
-        tableView->setContextMenuPolicy(Qt::CustomContextMenu);
-        connect(tableView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(slotDeleteTutor2(QPoint)));
+        connect(tableView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(slotDeleteTutor2(QPoint))); //!!!
         setCentralWidget(tableView);
     }
-    if(action->text()==tr("добавить/удалить номинацию")){
+    if(action->text()==tr("Добавить или удалить номинацию")){
         QSqlQuery query(db);
-        if(!query.exec("SELECT * FROM az_disciplines;")){
+        if(!query.exec("SELECT * FROM lnr_nominations;")){
             getMessageBox("Таблица с номинациями не открылась",true);
             return;
         }
@@ -178,37 +195,37 @@ void MainWindow::slotTriggeredMenuBar(QAction* action){
 
         connect(add,SIGNAL(pressed()),this,SLOT(slotAddDiscipline()));
     }
-    if(action->text()==tr("добавить/удалить регион")){                          // не надо
-        QSqlQuery query(db);
-        if(!query.exec("SELECT * FROM az_regions;")){
-            getMessageBox("Таблица с регионами не открылась",true);
-            return;
-        }
-        delete centralWidget();
-        tableView=new QTableView();
-        tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-        model->setQuery(query);
-        tableView->setModel(model);
-        tableView->setContextMenuPolicy(Qt::CustomContextMenu);
-        connect(tableView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(slotDeleteRegion(QPoint)));
+//    if(action->text()==tr("добавить/удалить регион")){                          // не надо
+//        QSqlQuery query(db);
+//        if(!query.exec("SELECT * FROM az_regions;")){
+//            getMessageBox("Таблица с регионами не открылась",true);
+//            return;
+//        }
+//        delete centralWidget();
+//        tableView=new QTableView();
+//        tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+//        model->setQuery(query);
+//        tableView->setModel(model);
+//        tableView->setContextMenuPolicy(Qt::CustomContextMenu);
+//        connect(tableView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(slotDeleteRegion(QPoint)));
 
-        QPushButton* add=new QPushButton("&Добавить",this);
-        lineEdit=new QLineEdit(this);
-        lineEdit->setPlaceholderText("Введите регион");
-        QVBoxLayout* layout1=new QVBoxLayout();
-        layout1->addWidget(lineEdit);
-        layout1->addWidget(add);
-        layout1->addStretch(1);
-        QHBoxLayout* layout2=new QHBoxLayout();
-        layout2->addWidget(tableView);
-        layout2->addLayout(layout1);
-        QWidget* widget=new QWidget(this);
-        widget->setLayout(layout2);
-        setCentralWidget(widget);
+//        QPushButton* add=new QPushButton("&Добавить",this);
+//        lineEdit=new QLineEdit(this);
+//        lineEdit->setPlaceholderText("Введите регион");
+//        QVBoxLayout* layout1=new QVBoxLayout();
+//        layout1->addWidget(lineEdit);
+//        layout1->addWidget(add);
+//        layout1->addStretch(1);
+//        QHBoxLayout* layout2=new QHBoxLayout();
+//        layout2->addWidget(tableView);
+//        layout2->addLayout(layout1);
+//        QWidget* widget=new QWidget(this);
+//        widget->setLayout(layout2);
+//        setCentralWidget(widget);
 
-        connect(add,SIGNAL(pressed()),this,SLOT(slotAddRegion()));
-    }
-    if(action->text()==tr("удалить члена жюри")){          // для жюри
+//        connect(add,SIGNAL(pressed()),this,SLOT(slotAddRegion()));
+//    }
+    if(action->text()==tr("Удалить члена жюри")){          // для жюри
                                                            // возможно надо сделать с одним человеком
         QSqlQuery query(db);
         if(!query.exec("SELECT * FROM az_clients;")){
@@ -221,7 +238,7 @@ void MainWindow::slotTriggeredMenuBar(QAction* action){
         model->setQuery(query);
         tableView->setModel(model);
         tableView->setContextMenuPolicy(Qt::CustomContextMenu);
-        connect(tableView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(slotDeleteClient(QPoint)));
+        connect(tableView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(slotDeleteClient(QPoint))); //!!!
         setCentralWidget(tableView);
     }
     if(action->text()==tr("статистика")){                       // баллы у участниц по номинациям
@@ -244,8 +261,8 @@ void MainWindow::slotTriggeredMenuBar(QAction* action){
         setCentralWidget(wid);
         emit person2.date->activated(0);
     }
-    if(action->text()==tr("профиль администратора")){
-        QFile file("D:/bd/lr3/files/admin.txt");                //заменить путь
+    if(action->text()==tr("Профиль администратора")){
+        QFile file("C:/Users/lesko/Desktop/C++/DB3-jul/Lab-3-BD/files/admin.txt");                //заменить путь
         if(!file.open(QIODevice::ReadOnly)){
             getMessageBox("Файл с данными администратора не открылся",true);
             return;
@@ -263,7 +280,7 @@ void MainWindow::slotTriggeredMenuBar(QAction* action){
         QFont font4(font2);
         font4.setBold(true);
 
-        QLabel* admin=new QLabel("Администратора");
+        QLabel* admin=new QLabel("Администратор");
         admin->setFont(font4);
         QLabel* infa=new QLabel("ФИО: "+str.section(",",1,1)
                                 +"\nНомер телефона: "+str.section(",",0,0)
@@ -271,17 +288,17 @@ void MainWindow::slotTriggeredMenuBar(QAction* action){
         infa->setFont(font3);
 
         QSqlQuery query1(db);
-        if(!query1.exec("SELECT COUNT(*) FROM az_tutors;")){
+        if(!query1.exec("SELECT COUNT(*) FROM lnr_participants;")){
             getMessageBox("Не открылась таблица с участницами",true);
             return;
         }
         query1.first();
         int tutors=query1.value(0).toInt();
-        if(!query1.exec("SELECT COUNT(*) FROM az_clients;")){
-            getMessageBox("Не открылась таблица с жюри",true);
-            return;
-        }
-        query1.first();
+//        if(!query1.exec("SELECT COUNT(*) FROM lnr_;")){
+//            getMessageBox("Не открылась таблица с жюри",true);
+//            return;
+//        }
+//        query1.first();
         int clients=query1.value(0).toInt();
 
         double profit=0;
@@ -317,8 +334,8 @@ void MainWindow::slotTriggeredMenuBar(QAction* action){
         widget->setLayout(layout3);
         setCentralWidget(widget);
     }
-    if(action->text()==tr("настройки профиля администратора")){
-        QFile file("D:/bd/lr3/files/admin.txt");                //заменить путь
+    if(action->text()==tr("Настройки профиля администратора")){
+        QFile file("C:/Users/lesko/Desktop/C++/DB3-jul/Lab-3-BD/files/admin.txt");                //заменить путь
         if(!file.open(QIODevice::ReadOnly)) {
             getMessageBox("Файл с данными администратора не открылся",true);
             return;
@@ -344,18 +361,31 @@ void MainWindow::slotTriggeredMenuBar(QAction* action){
         setCentralWidget(w);
         connect(button,SIGNAL(pressed()),this,SLOT(changeInfoAdmin()));
     }
-    if(action->text()==tr("выйти")){
+    if(action->text()==tr("Выйти")){
         delete centralWidget();
         tableView=new QTableView();
         tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-        setWindowIcon(QIcon(":/MyPictures/pictures/mainIcon.jpg"));
+//        setWindowIcon(QIcon(":/MyPictures/pictures/mainIcon.jpg"));
         setWindowTitle(tr("Главная страница"));
 
-        QPixmap bkgnd(":/MyPictures/pictures/mainPicture.jfif");
-        bkgnd = bkgnd.scaled(this->size(), Qt::KeepAspectRatio);
-        setFixedSize(QSize(bkgnd.width(),bkgnd.height()));
-        palette->setBrush(QPalette::Window, bkgnd);
-        setPalette(*palette);
+//        QPixmap bkgnd(":/MyPictures/pictures/mainPicture.jfif");
+//        bkgnd = bkgnd.scaled(this->size(), Qt::KeepAspectRatio);
+//        setFixedSize(QSize(bkgnd.width(),bkgnd.height()));
+//        palette->setBrush(QPalette::Window, bkgnd);
+//        setPalette(*palette);
+
+        QWidget *widget = new QWidget;
+        setCentralWidget(widget);
+
+        infoLabel = new QLabel(tr("<i>Желаете зарегистрироваться на\n"
+                                  "<b>Мисс Бауман 2022</b>?</i>"));
+        infoLabel->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
+        infoLabel->setAlignment(Qt::AlignCenter);
+
+        QVBoxLayout *layout = new QVBoxLayout;
+        layout->setContentsMargins(5, 5, 5, 5);
+        layout->addWidget(infoLabel);
+        widget->setLayout(layout);
 
         changeMenuBar({{tr("&Войти")},{tr("&Участницы")}});
     }
@@ -376,21 +406,22 @@ void MainWindow::slotTriggeredMenuBar(QAction* action){
         font4.setBold(true);
 
         QSqlQuery q(db);
-        if(!q.exec("SELECT * FROM az_tutors WHERE Телефон='"+property("telephone").toString()+"';")){  // по зачетке
-            getMessageBox("Таблица с репетиторами не открывается",true);
+        if(!q.exec("SELECT * FROM lnr_participants WHERE Номер_зачётки='"+property("telephone").toString()+"';")){  // по зачетке
+            getMessageBox("Таблица с участницами не открывается",true);
             return;
          }
         q.first();
         QLabel* admin=new QLabel("Участница");
         admin->setFont(font4);
-        QLabel* infa=new QLabel("Номер телефона: "+q.value(0).toString()      //переделать
+        QLabel* infa=new QLabel("Номер зачётки: "+q.value(0).toString()      //переделать
                                 +"\nФИО: "+q.value(1).toString()
-                                +"\nПредмет: "+q.value(2).toString()
-                                +"\nРегион: "+q.value(3).toString()
-                                +"\nЦена: "+q.value(4).toString()
-                                +"\nПароль: "+q.value(5).toString(),this);
+                                +"\nВес: "+q.value(2).toString()
+                                +"\nРост: "+q.value(3).toString()
+                                +"\nВозраст: "+q.value(4).toString()
+                                +"\nТалант: "+q.value(5).toString()
+                                +"\nПароль: "+q.value(6).toString(),this);
         infa->setFont(font3);
-        setProperty("price",q.value(4).toString());
+        setProperty("price",q.value(4).toString());      // !!!
 
         QSqlQuery query1(db);
         if(!query1.exec("SELECT COUNT(*) FROM az_lessons WHERE Телефон_репетитора='"+property("telephone").toString()+"' AND Было_занятие=true;")){
